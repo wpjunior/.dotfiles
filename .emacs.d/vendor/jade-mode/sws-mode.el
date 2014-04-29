@@ -1,3 +1,8 @@
+;;; sws-mode.el --- (S)ignificant (W)hite(S)pace mode
+;;;
+;;; URL: https://github.com/brianc/jade-mode
+;;; Author: Brian M. Carlson and other contributors
+;;;
 (require 'font-lock)
 
 (defvar sws-tab-width 2)
@@ -9,8 +14,11 @@
 (defun sws-previous-indentation ()
   "Gets indentation of previous line"
   (save-excursion
-    (previous-line)
-    (current-indentation)))
+    (forward-line -1)
+    (if (bobp) 0
+      (progn
+        (while (and (looking-at "^[ \t]*$") (not (bobp))) (forward-line -1))
+        (current-indentation)))))
 
 (defun sws-max-indent ()
   "Calculates max indentation"
@@ -39,12 +47,13 @@
 (defun sws-indent-line ()
   "Indents current line"
   (interactive)
-  (if mark-active
-      (sws-indent-region)
-    (if (sws-at-bot-p)
-        (sws-do-indent-line)
-      ;; instead of adjusting indent, move point to text
-      (sws-point-to-bot))))
+  (if (eq this-command 'indent-for-tab-command)
+    (if mark-active
+        (sws-indent-region (region-beginning) (region-end))
+      (if (sws-at-bot-p)
+          (sws-do-indent-line)
+        (sws-point-to-bot)))
+    (indent-to (sws-previous-indentation))))
 
 (defun sws-at-bol-p ()
   "If point is at beginning of line"
@@ -110,6 +119,7 @@
 (define-key sws-mode-map [S-tab] 'sws-dendent-line)
 (define-key sws-mode-map [backtab] 'sws-dendent-line)
 
+;;;###autoload
 (define-derived-mode sws-mode fundamental-mode
   "sws"
   "Major mode for editing significant whitespace files"
@@ -131,3 +141,4 @@
   (setq major-mode 'sws-mode))
 
 (provide 'sws-mode)
+;;; sws-mode.el ends here
