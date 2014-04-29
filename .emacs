@@ -1,9 +1,8 @@
 (add-to-list 'load-path "~/.emacs.d")
 (setq user-mail-address "wilsonpjunior@gmail.com")
 (column-number-mode)
-(setq fill-column 59)
-(setq-default fill-column 72)
-
+(autoload 'python-mode "python-mode.el" "Python mode." t)
+(setq auto-mode-alist (append '(("/*.\.py$" . python-mode)) auto-mode-alist))
 ;; No backup files
 (setq make-backup-files nil)
 
@@ -134,9 +133,6 @@
 (add-hook 'coffee-mode-hook
   '(lambda() (coffee-custom)))
 
-(defun html-custom ()
-  "coffee-mode-hook"
- (set (make-local-variable 'tab-width) 4))
 
 (add-hook 'html-mode-hook
   '(lambda() (html-custom)))
@@ -233,3 +229,48 @@
 (autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
 (setq auto-mode-alist
       (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
+
+
+;; Set the number to the number of columns to use.
+(setq-default fill-column 79)
+
+;; Add Autofill mode to mode hooks.
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+
+;; Show line number in the mode line.
+(line-number-mode 1)
+
+;; Show column number in the mode line.
+(column-number-mode 1)
+
+(add-to-list 'load-path "~/.emacs.d/vendor/column-marker")
+(require 'column-marker)
+(set-face-background 'column-marker-1 "red")
+(add-hook 'python-mode-hook
+          (lambda () (interactive)
+            (column-marker-1 fill-column)))
+
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(setq flycheck-highlighting-mode 'lines)
+
+(require 'py-autopep8)
+(add-hook 'before-save-hook 'py-autopep8-before-save)
+
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t) 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ecb-options-version "2.40"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
