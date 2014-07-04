@@ -27,6 +27,8 @@
 (autoload 'javascript-mode "javascript" nil t)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
 
+
+
 (defun duplicate()
  "Duplicate it."
  (interactive)
@@ -94,7 +96,7 @@
 
 
 ;; Always do syntax highlighting
-(global-font-lock-mode 1)
+;;(global-font-lock-mode 1)
 
 ;; Font face/size
 ;(add-to-list 'default-frame-alist '(font . "Monospace 8"))
@@ -242,3 +244,4 @@
  )
 
 (load-theme 'monokai t)
+
