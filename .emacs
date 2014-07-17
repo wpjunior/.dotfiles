@@ -1,3 +1,10 @@
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives '
+             ("marmallade" . "http://marmalade-repo.org/packages/"))
+
+(package-initialize)
 (add-to-list 'load-path "~/.emacs.d")
 (setq user-mail-address "wilsonpjunior@gmail.com")
 (column-number-mode)
@@ -13,8 +20,18 @@
 ;; scrool 
 (setq scroll-conservatively 10000)
 
+;; No f*cking bell
+(setq ring-bell-function 'ignore)
+
 ;; encoding
 (setq current-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+(setq current-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
 
 
 ;; disable arrow keys
@@ -26,8 +43,6 @@
 ;; javascript mode
 (autoload 'javascript-mode "javascript" nil t)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
-
-
 
 (defun duplicate()
  "Duplicate it."
@@ -89,7 +104,6 @@
 
 (add-hook 'coffee-mode-hook
   '(lambda() (coffee-custom)))
-
 
 (add-hook 'html-mode-hook
   '(lambda() (html-custom)))
@@ -172,20 +186,10 @@
 
 ;; mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
-
-;; Copy files to ~/.emacs.d/elisp/feature-mode and add this to your
-;; .emacs to load the mode
-(add-to-list 'load-path "~/.emacs.d/elisp/feature-mode")
-(add-to-list 'load-path "~/.emacs.d/elisp/csharp-mode")
-;; optional configurations
-;; default language if .feature doesn't have "# language: fi"
 (setq feature-default-language "pt")
 ;; ;; point to cucumber languages.yml or gherkin i18n.yml to use
 ;; ;; exactly the same localization your cucumber uses
 (setq feature-default-i18n-file "~/.emacs.d/i18n.yml")
-;; ;; and load feature-mode
-(require 'feature-mode)
-(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
 
 ;; web-mode
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
@@ -214,18 +218,15 @@
           (lambda () (interactive)
             (column-marker-1 fill-column)))
 
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '
-             ("marmallade" . "http://marmalade-repo.org/packages/"))
 
-(package-initialize)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (setq flycheck-highlighting-mode 'lines)
 
 (require 'py-autopep8)
 (add-hook 'before-save-hook 'py-autopep8-before-save)
+
+(defun git () (interactive) (magit-status "."))
+(defun git-blame () (interactive) (mo-git-blame-current))
 
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t) 
@@ -245,3 +246,17 @@
 
 (load-theme 'monokai t)
 
+(defun web-mode-hook ()
+  "Hooks for web mode."
+
+  (setq web-mode-markup-indent-offset 2)
+  (web-mode-set-engine "django"))
+(add-hook 'web-mode-hook 'web-mode-hook)
+;; Loading YAS personal snippets
+(setq yas/root-directory "~/.emacs.d/snippets")
+(yas/load-directory yas/root-directory)
+
+;; Configuring the dropdown list, submodule used by yasnippet
+(require 'dropdown-list)
+(setq yas/prompt-functions '(yas/dropdown-prompt))
+(server-mode)
