@@ -17,6 +17,33 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-screen t)
 
+;; font face/size
+(add-to-list 'default-frame-alist '(font . "6x13"))
+
+;; No f*cking bell
+(setq ring-bell-function 'ignore)
+
+;; moving from one window to another
+(global-set-key [(ctrl <)] 'next-multiframe-window)
+(global-set-key [(ctrl >)] 'previous-multiframe-window)
+
+;; moving from one frame to another
+(global-set-key [(C-tab)] 'other-window)
+(global-set-key [(shift C-tab)] '(lambda () (interactive) (other-window -1)))
+
+;; Mac specific stuff
+(when (eq system-type 'darwin)
+  (setq mac-option-modifier 'alt)
+  (setq mac-command-modifier 'meta)
+  ;; sets fn-delete to be right-delete
+  (global-set-key [kp-delete] 'delete-char)
+  (menu-bar-mode 1))
+
+;; scrolling without changing the cursor
+(global-set-key [(meta n)] '(lambda () (interactive) (scroll-up 1)))
+(global-set-key [(meta p)] '(lambda () (interactive) (scroll-down 1)))
+
+
 ;; scrool 
 (setq scroll-conservatively 10000)
 
@@ -219,7 +246,6 @@
             (column-marker-1 fill-column)))
 
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
 (setq flycheck-highlighting-mode 'lines)
 
 (require 'py-autopep8)
@@ -253,10 +279,14 @@
   (web-mode-set-engine "django"))
 (add-hook 'web-mode-hook 'web-mode-hook)
 ;; Loading YAS personal snippets
-(setq yas/root-directory "~/.emacs.d/snippets")
-(yas/load-directory yas/root-directory)
+;;(setq yas/root-directory "~/.emacs.d/snippets")
+;;yas/load-directory yas/root-directory)
 
 ;; Configuring the dropdown list, submodule used by yasnippet
 (require 'dropdown-list)
 (setq yas/prompt-functions '(yas/dropdown-prompt))
+
+(custom-set-variables
+ '(initial-frame-alist (quote ((fullscreen . maximized)))))
+
 (server-mode)
