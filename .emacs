@@ -23,6 +23,9 @@
 ;; No f*cking bell
 (setq ring-bell-function 'ignore)
 
+;; show white spaces
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; moving from one window to another
 (global-set-key [(ctrl <)] 'next-multiframe-window)
 (global-set-key [(ctrl >)] 'previous-multiframe-window)
@@ -44,7 +47,10 @@
 (global-set-key [(meta p)] '(lambda () (interactive) (scroll-down 1)))
 
 
-;; scrool 
+;; ecb
+(setq ecb-tip-of-the-day nil)
+
+;; scrool
 (setq scroll-conservatively 10000)
 
 ;; No f*cking bell
@@ -62,10 +68,10 @@
 
 
 ;; disable arrow keys
-(global-unset-key (kbd "<left>") )
-(global-unset-key (kbd "<right>") )
-(global-unset-key (kbd "<up>") )
-(global-unset-key (kbd "<down>") )
+;;(global-unset-key (kbd "<left>") )
+;;(global-unset-key (kbd "<right>") )
+;;(global-unset-key (kbd "<up>") )
+;;(global-unset-key (kbd "<down>") )
 
 ;; javascript mode
 (autoload 'javascript-mode "javascript" nil t)
@@ -95,7 +101,7 @@
   (shell-command "rm /tmp/tmp.ps")
   (message (concat "Saved to:  " (buffer-name) ".pdf"))
 
-  
+
   )
 
 (require 'php-mode)
@@ -115,7 +121,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/vendor/jade-mode")
 (require 'sws-mode)
-(require 'jade-mode)    
+(require 'jade-mode)
 (add-to-list 'auto-mode-alist '("\\.styl$" . sws-mode))
 (add-to-list 'auto-mode-alist '("\\.jade$" . jade-mode))
 
@@ -143,6 +149,9 @@
 ;(add-to-list 'default-frame-alist '(font . "Monospace 8"))
 ;;(add-to-list 'default-frame-alist '(font . "6x13"))
 
+
+;; Whitespaces
+(setq show-trailing-whitespace t)
 ;;; Also highlight parens
 (setq show-paren-delay 0 show-paren-style 'parenthesis)
 (show-paren-mode 1)
@@ -157,7 +166,6 @@
 
 ;; gdb
 (setq gdb-many-windows 1)
-
 
 ;; js2
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
@@ -209,7 +217,10 @@
 ;(global-set-key "\C-x\C-n"  'make-frame)
 
 ;; other window
-;(global-set-key [C-tab] 'other-window)
+(global-set-key [f5] 'projectile-find-file)
+(global-set-key [f6] 'projectile-grep)
+(global-set-key [f7] 'mc/mark-next-like-this)
+(global-set-key [f8] 'dash-at-point)
 
 ;; mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
@@ -255,22 +266,6 @@
 (defun git-blame () (interactive) (mo-git-blame-current))
 
 (add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t) 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40" default)))
- '(ecb-options-version "2.40"))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-(load-theme 'monokai t)
 
 (defun web-mode-hook ()
   "Hooks for web mode."
@@ -278,15 +273,29 @@
   (setq web-mode-markup-indent-offset 2)
   (web-mode-set-engine "django"))
 (add-hook 'web-mode-hook 'web-mode-hook)
-;; Loading YAS personal snippets
-;;(setq yas/root-directory "~/.emacs.d/snippets")
-;;yas/load-directory yas/root-directory)
 
-;; Configuring the dropdown list, submodule used by yasnippet
+;; Loading YAS personal snippets
+(yas-global-mode)
+(yas/load-directory "~/.emacs.d/yasnippets") ;mine, not systems
+
 (require 'dropdown-list)
 (setq yas/prompt-functions '(yas/dropdown-prompt))
 
-(custom-set-variables
- '(initial-frame-alist (quote ((fullscreen . maximized)))))
+;; autocomplete setup
+(require 'auto-complete-config)
+
+(ac-set-trigger-key "TAB")
+(ac-set-trigger-key "<tab>")
+
+;; projectile to search fast mode file
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+(setq projectile-completion-system 'grizzl)
+(smartparens-global-mode)
+
+(maximize-frame)
+
+
+(require 'monokai-theme)
 
 (server-mode)
