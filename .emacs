@@ -3,7 +3,7 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives '
              ("marmallade" . "http://marmalade-repo.org/packages/"))
-
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
 (package-initialize)
 (add-to-list 'load-path "~/.emacs.d")
 (setq user-mail-address "wilsonpjunior@gmail.com")
@@ -75,7 +75,6 @@
 
 ;; javascript mode
 (autoload 'javascript-mode "javascript" nil t)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
 
 (defun duplicate()
  "Duplicate it."
@@ -89,6 +88,8 @@
    (yank)
    (newline)
    (forward-line -1)))
+
+(global-set-key "\M-s\M-s" 'duplicate)
 
 (defun print-to-pdf ()
   (interactive)
@@ -222,6 +223,7 @@
 (global-set-key [f7] 'mc/mark-next-like-this)
 (global-set-key [f8] 'dash-at-point)
 
+
 ;; mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 (setq feature-default-language "pt")
@@ -258,6 +260,8 @@
 
 
 (setq flycheck-highlighting-mode 'lines)
+(require 'flymake-jshint)
+(add-hook 'js2-mode-hook 'flymake-mode)
 
 (require 'py-autopep8)
 (add-hook 'before-save-hook 'py-autopep8-before-save)
@@ -291,6 +295,8 @@
 (projectile-global-mode)
 (setq projectile-enable-caching t)
 (setq projectile-completion-system 'grizzl)
+
+
 (smartparens-global-mode)
 
 (maximize-frame)

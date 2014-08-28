@@ -1,0 +1,10 @@
+{
+  "undef": true,
+  "unused": true,
+  "strict": false,
+  "expr": true,
+  "camelcase": true,
+  "eqeqeq": true,
+  "curly": true,
+  "predef": [ "require", "describe", "beforeEach", "afterEach", "it", "setTimeout" ]
+}
