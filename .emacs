@@ -18,7 +18,7 @@
 (setq inhibit-startup-screen t)
 
 ;; font face/size
-(add-to-list 'default-frame-alist '(font . "6x13"))
+;;(add-to-list 'default-frame-alist '(font . "10x14"))
 
 ;; No f*cking bell
 (setq ring-bell-function 'ignore)
@@ -41,6 +41,8 @@
   ;; sets fn-delete to be right-delete
   (global-set-key [kp-delete] 'delete-char)
   (menu-bar-mode 1))
+
+
 
 ;; scrolling without changing the cursor
 (global-set-key [(meta n)] '(lambda () (interactive) (scroll-up 1)))
@@ -147,8 +149,8 @@
 ;;(global-font-lock-mode 1)
 
 ;; Font face/size
-;(add-to-list 'default-frame-alist '(font . "Monospace 8"))
-;;(add-to-list 'default-frame-alist '(font . "6x13"))
+;;(add-to-list 'default-frame-alist '(font . "Monospace 8"))
+(add-to-list 'default-frame-alist '(font . "12x13"))
 
 
 ;; Whitespaces
@@ -260,8 +262,6 @@
 
 
 (setq flycheck-highlighting-mode 'lines)
-(require 'flymake-jshint)
-(add-hook 'js2-mode-hook 'flymake-mode)
 
 (require 'py-autopep8)
 (add-hook 'before-save-hook 'py-autopep8-before-save)
@@ -270,6 +270,16 @@
 (defun git-blame () (interactive) (mo-git-blame-current))
 
 (add-hook 'python-mode-hook 'jedi:setup)
+
+;; disable gui dialogs
+(defadvice yes-or-no-p (around prevent-dialog activate)
+  "Prevent yes-or-no-p from activating a dialog"
+  (let ((use-dialog-box nil))
+    ad-do-it))
+(defadvice y-or-n-p (around prevent-dialog-yorn activate)
+  "Prevent y-or-n-p from activating a dialog"
+  (let ((use-dialog-box nil))
+    ad-do-it))
 
 (defun web-mode-hook ()
   "Hooks for web mode."
@@ -282,8 +292,8 @@
 (yas-global-mode)
 (yas/load-directory "~/.emacs.d/yasnippets") ;mine, not systems
 
-(require 'dropdown-list)
-(setq yas/prompt-functions '(yas/dropdown-prompt))
+;(require 'dropdown-list)
+;(setq yas/prompt-functions '(yas/dropdown-prompt))
 
 ;; autocomplete setup
 (require 'auto-complete-config)
@@ -293,15 +303,104 @@
 
 ;; projectile to search fast mode file
 (projectile-global-mode)
+(add-hook 'after-init-hook #'global-flycheck-mode)
 (setq projectile-enable-caching t)
 (setq projectile-completion-system 'grizzl)
 
-
 (smartparens-global-mode)
 
-(maximize-frame)
+(toggle-frame-fullscreen)
+
+;; compact mode
+(defvar-local hidden-mode-line-mode nil)
+(defvar-local hide-mode-line nil)
+
+(define-minor-mode hidden-mode-line-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global nil
+  :variable hidden-mode-line-mode
+  :group 'editing-basics
+  (if hidden-mode-line-mode
+      (setq hide-mode-line mode-line-format
+            mode-line-format nil)
+    (setq mode-line-format hide-mode-line
+          hide-mode-line nil))
+  (force-mode-line-update)
+  ;; Apparently force-mode-line-update is not always enough to
+  ;; redisplay the mode-line
+  (redraw-display)
+  (when (and (called-interactively-p 'interactive)
+             hidden-mode-line-mode)
+    (run-with-idle-timer
+     0 nil 'message
+     (concat "Hidden Mode Line Mode enabled.  "
+             "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
+
+;; Activate hidden-mode-line-mode
+(hidden-mode-line-mode 1)
+(add-hook 'after-change-major-mode-hook 'hidden-mode-line-mode)
+
+(defmacro with-face (str &rest properties)
+    `(propertize ,str 'face (list ,@properties)))
+
+  (defun sl/make-header ()
+    ""
+    (let* ((sl/full-header (abbreviate-file-name buffer-file-name))
+           (sl/header (file-name-directory sl/full-header))
+           (sl/drop-str "[...]"))
+      (if (> (length sl/full-header)
+             (window-body-width))
+          (if (> (length sl/header)
+                 (window-body-width))
+              (progn
+                (concat (with-face sl/drop-str
+                                   :background "blue"
+                                   :weight 'bold
+                                   )
+                        (with-face (substring sl/header
+                                              (+ (- (length sl/header)
+                                                    (window-body-width))
+                                                 (length sl/drop-str))
+                                              (length sl/header))
+                                   ;; :background "red"
+                                   :weight 'bold
+                                   )))
+            (concat (with-face sl/header
+                               ;; :background "red"
+                               :foreground "#8fb28f"
+                               :weight 'bold
+                               )))
+        (concat (with-face sl/header
+                           ;; :background "green"
+                           ;; :foreground "black"
+                           :weight 'bold
+                           :foreground "#8fb28f"
+                           )
+                (with-face (file-name-nondirectory buffer-file-name)
+                           :weight 'bold
+                           ;; :background "red"
+                           )))))
+
+  (defun sl/display-header ()
+    (setq header-line-format
+          '("" ;; invocation-name
+            (:eval (if (buffer-file-name)
+                       (sl/make-header)
+                     "%b")))))
 
 
-(require 'monokai-theme)
+
+  (add-hook 'buffer-list-update-hook
+            'sl/display-header)
+
+
+
+
+
+
+(color-theme-initialize)
+(require 'solarized-dark-theme)
+
 
 (server-mode)
